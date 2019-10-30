@@ -2,8 +2,9 @@
 跨域修改iframe页面内容
 
 ## Usage
-通过代理页面将主站点的信息传递给iframe目标页面, 参数格式:
+将proxy.html页面放到iframe页面同域的服务下, 并且可以访问, 主站点通过proxy.html与iframe目标页面交互, 参数格式:
 {
+    origin,
     iframe,
     includeStyle,
     includeScript,
