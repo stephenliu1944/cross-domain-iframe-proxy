@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<style type="text/css">
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+</style>
+<script type="text/javascript">
+// 启用JS引入, 会有安全性问题, 慎重使用!
+var ENABLED_JS_INCLUDE = false; 
+
+function appendIFrame(iframe) {
+    document.body.innerHTML = iframe;
+    return document.querySelector('iframe');
+}
+
+function appendElement(doc, tag, options) {
+    var element = doc.createElement(tag);
+    Object.keys(options).forEach(function(key) {
+        element[key] = options[key];
+    });
+    doc.body.appendChild(element);
+}
+// 包含css脚本
+function includeStyle(style, iframeWindow) {
+    appendElement(iframeWindow.document, 'style', {
+        type: 'text/css',
+        innerText: style.replace(/\s/g, '')
+    });
+}
+// 包含js脚本
+function includeScript(script, iframeWindow) {
+    appendElement(iframeWindow.document, 'script', {
+        type: 'text/javascript',
+        innerText: script.replace(/\s/g, '')
+    });
+}
+// 导入css文件
+function importStyle(href, iframeWindow) {
+    if (!href) return;
+    
+    appendElement(iframeWindow.document, 'link', {
+        rel: 'stylesheet',
+        href: href
+    });
+}
+// 导入js文件
+function importScript(src, iframeWindow) {
+    if (!src) return;
+
+    appendElement(iframeWindow.document, 'script', {
+        type: 'text/javascript',
+        src: src
+    });
+}
+
+function appendToIframe(options) {
+    var iframeTag = options.iframe;
+    var styleText = options.includeStyle;
+    var scriptText = options.includeScript;
+    var styleURL = options.importStyle;
+    var scriptURL = options.importScript;
+
+    try {
+        var iframe = appendIFrame(iframeTag);
+        // iframe.onload = function() {
+        var contentWindow = iframe.contentWindow;
+        contentWindow.addEventListener('DOMContentLoaded', function(event) {    // DOMContentLoaded 更快响应
+            styleText && includeStyle(styleText, contentWindow);        
+            styleURL && importStyle(styleURL, contentWindow);        
+
+            if (ENABLED_JS_INCLUDE) {
+                // 包含 js 脚本
+                scriptText && includeScript(scriptText, contentWindow);        
+                // 导入 js 文件
+                scriptURL && importScript(scriptURL, contentWindow);        
+            }
+        });
+    } catch(e) {
+        console.error(e);
+    }
+}
+
+function init(window) {
+    var originREG = /origin=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;           
+    var iframeNameREG = /iframe=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;      
+    var url = window.location.search;     
+    var originMatch = url.match(originREG);
+    var iframeMatch = url.match(iframeNameREG);
+
+    if (iframeMatch) {      
+        var includeStyleREG = /include[Ss]tyle=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;
+        var includeScriptREG = /include[Ss]cript=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;
+        var importStyleREG = /import[Ss]tyle=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;
+        var importScriptREG = /import[Ss]cript=([\:\/\!\(\)\-\*_\~\.\w\%]+)/;
+        
+        // window.onload = function() {
+        window.addEventListener('DOMContentLoaded', function(event) {   // DOMContentLoaded 更快响应
+            var includeStyleMatch = url.match(includeStyleREG);
+            var includeScriptMatch = url.match(includeScriptREG);
+            var importStyleMatch = url.match(importStyleREG);
+            var importScriptMatch = url.match(importScriptREG);
+
+            appendToIframe({
+                iframe: iframeMatch && decodeURIComponent(iframeMatch[1]),
+                includeStyle: includeStyleMatch && decodeURIComponent(includeStyleMatch[1]),
+                includeScript: includeScriptMatch && decodeURIComponent(includeScriptMatch[1]),
+                importStyle: importStyleMatch && decodeURIComponent(importStyleMatch[1]),
+                importScript: importScriptMatch && decodeURIComponent(importScriptMatch[1])
+            }); 
+        });
+    } else if (originMatch) {
+        window.onmessage = function(event) {    
+            // 确定来源, 可能接收到其他域的信息.
+            if (event.origin !== originMatch[1]) {
+                return;
+            }
+            var options = JSON.parse(event.data);
+            appendToIframe(options);
+        }
+    }
+}
+
+init(window);
+</script>
+</head>
+<body>
+</body>
+</html>
