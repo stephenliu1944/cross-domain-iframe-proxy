@@ -49,7 +49,7 @@ function importStyle(href, iframeWindow) {
     
     appendElement(iframeWindow.document, 'link', {
         rel: 'stylesheet',
-        href: href
+        href: href.replace(/\s/g, '')
     });
 }
 // 导入js文件
@@ -58,7 +58,7 @@ function importScript(src, iframeWindow) {
 
     appendElement(iframeWindow.document, 'script', {
         type: 'text/javascript',
-        src: src
+        src: src.replace(/\s/g, '')
     });
 }
 
