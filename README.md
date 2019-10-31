@@ -1,17 +1,17 @@
 # cross-domain-iframe-proxy
-跨域修改iframe页面内容
+跨域修改iframe页面内容.
 
 ## Precondition
 前提条件需要将proxy.html放到与内嵌的iframe页同域的服务下, 并且可以被访问.
 主站点通过proxy.html与iframe目标页交互.
-![](http://git.bbdops.com/frontend/mazarine-ui/raw/master/resources/images/thinLine.png)
 
 ## Usage
 支持2种调用方式: 使用 postMessage 和 URL传参.
 
 ### Use postMessage
-使用 window.postMessage 的方式需要使用JSON.stringify将对象转为字符串.
+使用 window.postMessage 的方式需要使用 JSON.stringify 将对象转为字符串.
 ```jsx
+// React
 function IframeProxy(props) {
     handleLoad = (e) => {
         e.target.contentWindow.postMessage(JSON.stringify({
@@ -44,6 +44,7 @@ function IframeProxy(props) {
 ### Use URL params
 使用 URL 传参的方式需要将内容用 encodeURIComponent 编码.
 ```jsx
+// React
 function IframeProxy(props) {
     var params = 'iframe=' + encodeURIComponent(`
         <iframe name="target" title="target" className="target" src="http://www.targetdomain.com/target.html" frameBorder="0" scrolling="no" style="width: 100%;height:100%"></iframe>
