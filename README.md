@@ -1,15 +1,18 @@
 # cross-domain-iframe-proxy
 跨域修改iframe页面内容.
 
-## Precondition
-前提条件需要将proxy.html放到与内嵌的iframe页同域的服务下, 并且可以被访问.
-主站点通过proxy.html与iframe目标页交互.
+## 原理
+![image.png](https://image-static.segmentfault.com/365/116/3651166373-5dba5af82fa06)
+主站点内嵌代理页面, 并向代理页传递数据, 代理页根据主站点的数据对目标页的DOM进行操作.由于代理页与目标页同域, 所以代理页可以获取并操作目标页的document对象.
 
-## Usage
-支持2种调用方式: 使用 postMessage 和 URL传参.
+## 前提条件
+需要将proxy.html放到与内嵌的iframe页同域的服务下, 并且可以被访问到.
 
-### Use postMessage
-使用 window.postMessage 的方式需要使用 JSON.stringify 将对象转为字符串.
+## 使用
+支持2种调用方式: 使用 postMessage 和 URL params.
+
+### postMessage
+该方法需要使用 JSON.stringify 将对象转为字符串.
 ```jsx
 // React
 function IframeProxy(props) {
@@ -41,8 +44,8 @@ function IframeProxy(props) {
 }
 ```
 
-### Use URL params
-使用 URL 传参的方式需要将内容用 encodeURIComponent 编码.
+### URL params
+该方法需要将传递的内容用 encodeURIComponent 编码.
 ```jsx
 // React
 function IframeProxy(props) {
